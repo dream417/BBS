@@ -8,7 +8,29 @@ request.setCharacterEncoding("gbk");
 int id = Integer.parseInt(request.getParameter("id"));
 int rootId = Integer.parseInt(request.getParameter("rootid"));
 String title=request.getParameter("title");
+if(title == null){
+	out.println("Error! please use the BBS in right way!");
+	return;
+}
+
+title = title.trim();
+if(title.equals("")){
+	out.println("Title cound not be empty!");
+	return;
+}
+
 String cont = request.getParameter("cont");
+if(cont == null){
+    out.println("Error! please use the BBS in right way!");
+    return;
+}
+
+cont = cont.trim();
+if(cont.equals("")){
+    out.println("Content cound not be empty!");
+    return;
+}
+
 
 cont = cont.replaceAll("\\n", "<br>");
 

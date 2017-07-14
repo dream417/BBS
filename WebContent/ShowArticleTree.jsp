@@ -9,7 +9,6 @@ String admin = (String)session.getAttribute("admin");
 if(admin != null && admin.equals("true")){
 	login = true;
 }
-System.out.println(""+login+""+admin);
 %>
 
 <%!

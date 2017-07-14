@@ -6,12 +6,39 @@
 
 
 <%
+int pageSize = 3;
+
+String strPageNo = request.getParameter("pageNo");
+int pageNo;
+if(strPageNo == null || strPageNo.equals("")){
+	pageNo = 1;
+}else{
+	try{
+		   pageNo = Integer.parseInt(strPageNo.trim());
+	}catch(NumberFormatException e){
+		pageNo=1;
+	}
+	if(pageNo<=0)pageNo=1;
+}
+
 Class.forName("com.mysql.jdbc.Driver");
 String url = "jdbc:mysql://localhost/db_bbs?user=root&password=123456";
 Connection conn = DriverManager.getConnection(url);
 
+Statement stmtCount = conn.createStatement();
+ResultSet rsCount = stmtCount.executeQuery("select count(*) from article where pid = 0");
+
+rsCount.next();
+int totalRecords = rsCount.getInt(1);
+
+int totalPages = (totalRecords%pageSize==0)?totalRecords/pageSize:totalRecords/pageSize+1;
+
+if(pageNo>=totalPages)pageNo=totalPages;
+
+int startPos = (pageNo-1)*pageSize;
+
 Statement stmt = conn.createStatement();
-ResultSet rs = stmt.executeQuery("select * from article where pid=0");
+ResultSet rs = stmt.executeQuery("select * from article where pid=0 order by pdate desc limit "+startPos + "," + pageSize);
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -40,5 +67,24 @@ stmt.close();
 conn.close();
 %>
 </table>
+
+¹²<%=totalPages %>Ò³£¬µÚ<%=pageNo %>Ò³
+<a href="ShowArticleFlat.jsp?pageNo=<%=pageNo-1%>"><</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="ShowArticleFlat.jsp?pageNo=<%=pageNo+1%>">></a>
+<form name="form1" action="ShowArticleFlat.jsp">
+    <select name="pageNo" onchange="document.form1.submit()">
+        <%
+        for(int i=1;i<=totalPages;i++){
+        %>
+        <option value=<%=i%><%=(i==pageNo)?" selected":"" %>>µÚ<%=i %>Ò³</option>
+        <%
+        }
+        %>
+    </select>
+</form>
+<form name="form2" action="ShowArticleFlat.jsp">
+    <input type="text" size=4 name="pageNo" value=<%=pageNo %> />
+    <button type="submit" >go</button>
+</form>
 </body>
 </html>
